@@ -1,8 +1,6 @@
-use bevy::{
-    prelude::*,
-};
+use bevy::prelude::*;
 
-const PADDLE_SIZE: Vec2 = Vec2::new(20.0, 120.0);
+const PADDLE_SIZE: bevy::prelude::Vec2 = bevy::prelude::Vec2::new(20.0, 120.0);
 const GAP_BETWEEN_PADDLE_AND_FLOOR: f32 = 60.0;
 const PADDLE_SPEED: f32 = 500.0;
 const WALL_PADDING: f32 = 10.0;
@@ -19,17 +17,8 @@ fn main() {
     App::new()
         .add_plugins(DefaultPlugins)
         .insert_resource(ClearColor(BACKGROUND_COLOR))
-        .add_event::<CollisionEvent>()
         .add_systems(Startup, setup)
-        .add_systems(
-            FixedUpdate,
-            (
-                apply_velocity,
-                move_paddle,
-            )
-                // `chain`ing systems together runs them in order
-                .chain(),
-        )
+        .add_systems(FixedUpdate, (apply_velocity, move_paddle).chain())
         .run();
 }
 
@@ -39,26 +28,15 @@ struct Paddle;
 #[derive(Component, Deref, DerefMut)]
 struct Velocity(Vec2);
 
-#[derive(Event, Default)]
-struct CollisionEvent;
-
-// Default must be implemented to define this as a required component for the Wall component below
-#[derive(Component, Default)]
-struct Collider;
-
-// This is a collection of the components that define a "Wall" in our game
 #[derive(Component)]
-#[require(Sprite, Transform, Collider)]
+#[require(Sprite, Transform)]
 struct Wall;
 
-// Add the game's entities to our world
-fn setup(
-    mut commands: Commands
-) {
+fn setup(mut commands: Commands) {
     commands.spawn(Camera2d);
 
     let paddle_y = BOTTOM_WALL + GAP_BETWEEN_PADDLE_AND_FLOOR;
-    let paddle_x:f32 = RIGHT_WALL + WALL_PADDING;
+    let paddle_x: f32 = RIGHT_WALL + WALL_PADDING;
 
     commands.spawn((
         Sprite::from_color(PADDLE_COLOR, Vec2::ONE),
@@ -68,10 +46,9 @@ fn setup(
             ..default()
         },
         Paddle,
-        Collider,
     ));
-
 }
+
 
 fn move_paddle(
     keyboard_input: Res<ButtonInput<KeyCode>>,
@@ -103,4 +80,3 @@ fn apply_velocity(mut query: Query<(&mut Transform, &Velocity)>, time: Res<Time>
         transform.translation.y += velocity.y * time.delta_secs();
     }
 }
-
