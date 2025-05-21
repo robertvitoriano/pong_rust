@@ -29,7 +29,6 @@ struct Paddle;
 struct Velocity(Vec2);
 
 #[derive(Component)]
-#[require(Sprite, Transform)]
 struct Wall;
 
 fn setup(mut commands: Commands) {
